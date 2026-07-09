@@ -243,11 +243,13 @@ func (p *customerConnectProvider) Configure(ctx context.Context, req provider.Co
 func (p *customerConnectProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		NewLocationDataSource,
+		NewConnectorDataSource,
 	}
 }
 
 func (p *customerConnectProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewLocationResource,
+		NewConnectorResource,
 	}
 }

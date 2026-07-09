@@ -12,7 +12,7 @@ Manages a NetFoundry Location.
 ## Example Usage
 
 ```terraform
-resource "customer-connect_location" "example" {
+resource "customer_connect_location" "example" {
   customer_id = "00000000-0000-0000-0000-000000000001"
   name        = "NYC Office"
   description = "New York City headquarters"
@@ -22,7 +22,7 @@ resource "customer-connect_location" "example" {
 }
 
 # Virtual location hosted on a cloud provider
-resource "customer-connect_location" "cloud" {
+resource "customer_connect_location" "cloud" {
   customer_id    = "00000000-0000-0000-0000-000000000001"
   name           = "AWS US-East-1"
   description    = "Virtual location in AWS us-east-1"
@@ -69,5 +69,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import an existing Location by its ID
-terraform import customer-connect_location.example "loc-00000000-0000-0000-0000-000000000001"
+terraform import customer_connect_location.example "loc-00000000-0000-0000-0000-000000000001"
 ```

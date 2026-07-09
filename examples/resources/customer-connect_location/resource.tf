@@ -1,4 +1,4 @@
-resource "customer-connect_location" "example" {
+resource "customer_connect_location" "example" {
   customer_id = "00000000-0000-0000-0000-000000000001"
   name        = "NYC Office"
   description = "New York City headquarters"
@@ -8,7 +8,7 @@ resource "customer-connect_location" "example" {
 }
 
 # Virtual location hosted on a cloud provider
-resource "customer-connect_location" "cloud" {
+resource "customer_connect_location" "cloud" {
   customer_id    = "00000000-0000-0000-0000-000000000001"
   name           = "AWS US-East-1"
   description    = "Virtual location in AWS us-east-1"
