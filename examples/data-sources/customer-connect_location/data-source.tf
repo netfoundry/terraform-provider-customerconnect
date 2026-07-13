@@ -1,6 +1,6 @@
 # Look up a Location by its ID
 data "customer-connect_location" "example" {
-  id = "loc-00000000-0000-0000-0000-000000000001"
+  id = "00000000-0000-0000-0000-000000000001"
 }
 
 # Reference computed attributes from the data source

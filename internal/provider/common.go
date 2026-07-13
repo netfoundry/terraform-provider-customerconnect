@@ -87,3 +87,14 @@ func stringValOrNull(s string) types.String {
 	}
 	return types.StringValue(s)
 }
+
+// stringSliceOrNil returns nil for an empty slice, otherwise s unchanged.
+// This ensures optional list fields not set by the API are represented as a
+// null list rather than an empty one, which would conflict with a Terraform
+// plan that has those fields as null.
+func stringSliceOrNil(s []string) []string {
+	if len(s) == 0 {
+		return nil
+	}
+	return s
+}
