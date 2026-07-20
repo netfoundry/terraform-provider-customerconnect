@@ -5,7 +5,7 @@ import (
 	"flag"
 	"log"
 
-	"terraform-provider-customer-connect/internal/provider"
+	"terraform-provider-customerconnect/internal/provider"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
@@ -27,7 +27,7 @@ func main() {
 
 	opts := providerserver.ServeOpts{
 		// TODO: Update this string with the published name of your provider.
-		Address: "hashicorp.com/netfoundry/customer-connect",
+		Address: "hashicorp.com/netfoundry/customerconnect",
 		Debug:   debug,
 	}
 

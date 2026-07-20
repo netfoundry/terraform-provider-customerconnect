@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 var _ resource.Resource = &accessPolicyResource{}
@@ -260,7 +261,8 @@ func (r *accessPolicyResource) Schema(_ context.Context, _ resource.SchemaReques
 	}
 }
 
-func (r *accessPolicyResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *accessPolicyResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	tflog.Debug(ctx, "Configuring access policy resource")
 	if req.ProviderData == nil {
 		return
 	}
@@ -274,6 +276,8 @@ func (r *accessPolicyResource) Configure(_ context.Context, req resource.Configu
 }
 
 func (r *accessPolicyResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	tflog.Debug(ctx, "Creating access policy")
+
 	var plan accessPolicyModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
@@ -310,6 +314,8 @@ func (r *accessPolicyResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
+	tflog.Debug(ctx, "Created access policy", map[string]any{"id": ap.ID})
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, accessPolicyFromAPI(ap))...)
 }
 
@@ -320,11 +326,14 @@ func (r *accessPolicyResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
+	tflog.Debug(ctx, "Reading access policy", map[string]any{"id": state.ID.ValueString()})
+
 	url := fmt.Sprintf("%s/access-policies/%s", r.client.apiBaseURL, state.ID.ValueString())
 
 	respBody, _, err := doRequest(ctx, http.MethodGet, url, r.client.accessToken, nil)
 	if err != nil {
 		if errors.Is(err, errNotFound) {
+			tflog.Debug(ctx, "Access policy not found, removing from state", map[string]any{"id": state.ID.ValueString()})
 			resp.State.RemoveResource(ctx)
 			return
 		}
@@ -347,6 +356,8 @@ func (r *accessPolicyResource) Update(ctx context.Context, req resource.UpdateRe
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	tflog.Debug(ctx, "Updating access policy", map[string]any{"id": plan.ID.ValueString()})
 
 	payload := updateAccessPolicyPayload{
 		Name:         plan.Name.ValueString(),
@@ -387,6 +398,8 @@ func (r *accessPolicyResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
+	tflog.Debug(ctx, "Deleting access policy", map[string]any{"id": state.ID.ValueString()})
+
 	url := fmt.Sprintf("%s/access-policies/%s", r.client.apiBaseURL, state.ID.ValueString())
 
 	_, _, err := doRequest(ctx, http.MethodDelete, url, r.client.accessToken, nil)
@@ -396,5 +409,6 @@ func (r *accessPolicyResource) Delete(ctx context.Context, req resource.DeleteRe
 }
 
 func (r *accessPolicyResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	tflog.Debug(ctx, "Importing access policy", map[string]any{"id": req.ID})
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

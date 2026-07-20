@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 var _ resource.Resource = &applicationResource{}
@@ -367,7 +368,8 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 	}
 }
 
-func (r *applicationResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *applicationResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	tflog.Debug(ctx, "Configuring application resource")
 	if req.ProviderData == nil {
 		return
 	}
@@ -381,6 +383,8 @@ func (r *applicationResource) Configure(_ context.Context, req resource.Configur
 }
 
 func (r *applicationResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	tflog.Debug(ctx, "Creating application")
+
 	var plan applicationModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
@@ -427,6 +431,8 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 
+	tflog.Debug(ctx, "Created application", map[string]any{"id": app.ID, "connector_id": app.ConnectorID})
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, applicationFromAPI(app))...)
 }
 
@@ -437,11 +443,14 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 		return
 	}
 
+	tflog.Debug(ctx, "Reading application", map[string]any{"id": state.ID.ValueString(), "connector_id": state.ConnectorID.ValueString()})
+
 	url := fmt.Sprintf("%s/connectors/%s/applications/%s", r.client.apiBaseURL, state.ConnectorID.ValueString(), state.ID.ValueString())
 
 	respBody, _, err := doRequest(ctx, http.MethodGet, url, r.client.accessToken, nil)
 	if err != nil {
 		if errors.Is(err, errNotFound) {
+			tflog.Debug(ctx, "Application not found, removing from state", map[string]any{"id": state.ID.ValueString()})
 			resp.State.RemoveResource(ctx)
 			return
 		}
@@ -464,6 +473,8 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	tflog.Debug(ctx, "Updating application", map[string]any{"id": plan.ID.ValueString(), "connector_id": plan.ConnectorID.ValueString()})
 
 	payload := updateApplicationPayload{}
 	if !plan.Name.IsNull() && !plan.Name.IsUnknown() {
@@ -516,6 +527,8 @@ func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteReq
 		return
 	}
 
+	tflog.Debug(ctx, "Deleting application", map[string]any{"id": state.ID.ValueString(), "connector_id": state.ConnectorID.ValueString()})
+
 	url := fmt.Sprintf("%s/connectors/%s/applications/%s", r.client.apiBaseURL, state.ConnectorID.ValueString(), state.ID.ValueString())
 
 	_, _, err := doRequest(ctx, http.MethodDelete, url, r.client.accessToken, nil)
@@ -527,6 +540,8 @@ func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteReq
 // ImportState accepts an import identifier of the form "connector_id/application_id",
 // since an Application can only be looked up in the context of its Connector.
 func (r *applicationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	tflog.Debug(ctx, "Importing application", map[string]any{"import_id": req.ID})
+
 	parts := strings.Split(req.ID, "/")
 	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
 		resp.Diagnostics.AddError(

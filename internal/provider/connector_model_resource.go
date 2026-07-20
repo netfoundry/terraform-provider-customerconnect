@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 var _ resource.Resource = &connectorModelResource{}
@@ -537,7 +538,8 @@ func (r *connectorModelResource) Schema(_ context.Context, _ resource.SchemaRequ
 	}
 }
 
-func (r *connectorModelResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *connectorModelResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	tflog.Debug(ctx, "Configuring connector model resource")
 	if req.ProviderData == nil {
 		return
 	}
@@ -551,6 +553,8 @@ func (r *connectorModelResource) Configure(_ context.Context, req resource.Confi
 }
 
 func (r *connectorModelResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	tflog.Debug(ctx, "Creating connector model")
+
 	var plan connectorModelModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
@@ -589,6 +593,8 @@ func (r *connectorModelResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
+	tflog.Debug(ctx, "Created connector model", map[string]any{"id": cm.ID})
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, connectorModelFromAPI(cm))...)
 }
 
@@ -599,11 +605,14 @@ func (r *connectorModelResource) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 
+	tflog.Debug(ctx, "Reading connector model", map[string]any{"id": state.ID.ValueString()})
+
 	url := fmt.Sprintf("%s/connector-models/%s", r.client.apiBaseURL, state.ID.ValueString())
 
 	respBody, _, err := doRequest(ctx, http.MethodGet, url, r.client.accessToken, nil)
 	if err != nil {
 		if errors.Is(err, errNotFound) {
+			tflog.Debug(ctx, "Connector model not found, removing from state", map[string]any{"id": state.ID.ValueString()})
 			resp.State.RemoveResource(ctx)
 			return
 		}
@@ -626,6 +635,8 @@ func (r *connectorModelResource) Update(ctx context.Context, req resource.Update
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	tflog.Debug(ctx, "Updating connector model", map[string]any{"id": plan.ID.ValueString()})
 
 	payload := updateConnectorModelPayload{
 		Name: plan.Name.ValueString(),
@@ -667,6 +678,8 @@ func (r *connectorModelResource) Delete(ctx context.Context, req resource.Delete
 		return
 	}
 
+	tflog.Debug(ctx, "Deleting connector model", map[string]any{"id": state.ID.ValueString()})
+
 	url := fmt.Sprintf("%s/connector-models/%s", r.client.apiBaseURL, state.ID.ValueString())
 
 	_, _, err := doRequest(ctx, http.MethodDelete, url, r.client.accessToken, nil)
@@ -676,5 +689,6 @@ func (r *connectorModelResource) Delete(ctx context.Context, req resource.Delete
 }
 
 func (r *connectorModelResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	tflog.Debug(ctx, "Importing connector model", map[string]any{"id": req.ID})
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

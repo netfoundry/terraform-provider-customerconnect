@@ -1,13 +1,13 @@
 # Look up a Location by its ID
-data "customer-connect_location" "example" {
+data "customerconnect_location" "example" {
   id = "00000000-0000-0000-0000-000000000001"
 }
 
 # Reference computed attributes from the data source
 output "location_name" {
-  value = data.customer-connect_location.example.name
+  value = data.customerconnect_location.example.name
 }
 
 output "location_enabled" {
-  value = data.customer-connect_location.example.enabled
+  value = data.customerconnect_location.example.enabled
 }

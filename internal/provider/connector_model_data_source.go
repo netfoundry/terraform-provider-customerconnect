@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 // connectorModelAddressDSAttrs returns the computed nested attributes for an
@@ -218,7 +219,8 @@ func (d *connectorModelDataSource) Schema(_ context.Context, _ datasource.Schema
 	}
 }
 
-func (d *connectorModelDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *connectorModelDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	tflog.Debug(ctx, "Configuring connector model data source")
 	if req.ProviderData == nil {
 		return
 	}
@@ -237,6 +239,8 @@ func (d *connectorModelDataSource) Read(ctx context.Context, req datasource.Read
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	tflog.Debug(ctx, "Reading connector model data source", map[string]any{"id": state.ID.ValueString()})
 
 	url := fmt.Sprintf("%s/connector-models/%s", d.client.apiBaseURL, state.ID.ValueString())
 

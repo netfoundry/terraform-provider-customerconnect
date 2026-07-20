@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 var _ resource.Resource = &locationResource{}
@@ -238,7 +239,8 @@ func (r *locationResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 	}
 }
 
-func (r *locationResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *locationResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	tflog.Debug(ctx, "Configuring location resource")
 	if req.ProviderData == nil {
 		return
 	}
@@ -252,6 +254,8 @@ func (r *locationResource) Configure(_ context.Context, req resource.ConfigureRe
 }
 
 func (r *locationResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	tflog.Debug(ctx, "Creating location")
+
 	var plan locationModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
@@ -335,6 +339,8 @@ func (r *locationResource) Create(ctx context.Context, req resource.CreateReques
 		}
 	}
 
+	tflog.Debug(ctx, "Created location", map[string]any{"id": state.ID.ValueString()})
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
@@ -345,11 +351,14 @@ func (r *locationResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
+	tflog.Debug(ctx, "Reading location", map[string]any{"id": state.ID.ValueString()})
+
 	url := fmt.Sprintf("%s/locations/%s", r.client.apiBaseURL, state.ID.ValueString())
 
 	respBody, _, err := doRequest(ctx, http.MethodGet, url, r.client.accessToken, nil)
 	if err != nil {
 		if errors.Is(err, errNotFound) {
+			tflog.Debug(ctx, "Location not found, removing from state", map[string]any{"id": state.ID.ValueString()})
 			resp.State.RemoveResource(ctx)
 			return
 		}
@@ -377,6 +386,8 @@ func (r *locationResource) Update(ctx context.Context, req resource.UpdateReques
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	tflog.Debug(ctx, "Updating location", map[string]any{"id": plan.ID.ValueString()})
 
 	payload := updateLocationPayload{}
 	if !plan.Name.IsNull() && !plan.Name.IsUnknown() {
@@ -445,6 +456,8 @@ func (r *locationResource) Delete(ctx context.Context, req resource.DeleteReques
 		return
 	}
 
+	tflog.Debug(ctx, "Deleting location", map[string]any{"id": state.ID.ValueString()})
+
 	url := fmt.Sprintf("%s/locations/%s", r.client.apiBaseURL, state.ID.ValueString())
 
 	_, _, err := doRequest(ctx, http.MethodDelete, url, r.client.accessToken, nil)
@@ -454,5 +467,6 @@ func (r *locationResource) Delete(ctx context.Context, req resource.DeleteReques
 }
 
 func (r *locationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	tflog.Debug(ctx, "Importing location", map[string]any{"id": req.ID})
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

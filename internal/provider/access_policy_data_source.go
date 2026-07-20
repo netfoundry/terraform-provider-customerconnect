@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 // endpointNestedDSAttrs returns the computed nested attributes for sources/destinations
@@ -110,7 +111,8 @@ func (d *accessPolicyDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 	}
 }
 
-func (d *accessPolicyDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *accessPolicyDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	tflog.Debug(ctx, "Configuring access policy data source")
 	if req.ProviderData == nil {
 		return
 	}
@@ -129,6 +131,8 @@ func (d *accessPolicyDataSource) Read(ctx context.Context, req datasource.ReadRe
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	tflog.Debug(ctx, "Reading access policy data source", map[string]any{"id": state.ID.ValueString()})
 
 	url := fmt.Sprintf("%s/access-policies/%s", d.client.apiBaseURL, state.ID.ValueString())
 

@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 var _ datasource.DataSource = &connectorDataSource{}
@@ -122,7 +123,8 @@ func (d *connectorDataSource) Schema(_ context.Context, _ datasource.SchemaReque
 	}
 }
 
-func (d *connectorDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *connectorDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	tflog.Debug(ctx, "Configuring connector data source")
 	if req.ProviderData == nil {
 		return
 	}
@@ -141,6 +143,8 @@ func (d *connectorDataSource) Read(ctx context.Context, req datasource.ReadReque
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	tflog.Debug(ctx, "Reading connector data source", map[string]any{"id": state.ID.ValueString()})
 
 	url := fmt.Sprintf("%s/connectors/%s", d.client.apiBaseURL, state.ID.ValueString())
 

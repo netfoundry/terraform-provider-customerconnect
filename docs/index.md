@@ -1,11 +1,11 @@
 ---
-page_title: "customer-connect Provider"
+page_title: "customerconnect Provider"
 subcategory: ""
 description: |-
   NetFoundry Customer Connect Terraform Provider
 ---
 
-# customer-connect Provider
+# customerconnect Provider
 
 NetFoundry Customer Connect Terraform Provider
 
@@ -14,14 +14,14 @@ NetFoundry Customer Connect Terraform Provider
 ```terraform
 terraform {
   required_providers {
-    customer-connect = {
-      source  = "netfoundry/customer-connect"
+    customerconnect = {
+      source  = "netfoundry/customerconnect"
       version = "~> 0.1"
     }
   }
 }
 
-provider "customer-connect" {
+provider "customerconnect" {
   # Cognito OAuth2 client credentials for the NetFoundry API.
   # These can also be supplied via NF_CLIENT_ID and NF_CLIENT_SECRET environment variables.
   client_id     = var.nf_client_id

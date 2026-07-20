@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 // applicationAddressDSAttrs returns the computed nested attributes for an
@@ -152,7 +153,8 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 	}
 }
 
-func (d *applicationDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *applicationDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	tflog.Debug(ctx, "Configuring application data source")
 	if req.ProviderData == nil {
 		return
 	}
@@ -171,6 +173,8 @@ func (d *applicationDataSource) Read(ctx context.Context, req datasource.ReadReq
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	tflog.Debug(ctx, "Reading application data source", map[string]any{"id": state.ID.ValueString(), "connector_id": state.ConnectorID.ValueString()})
 
 	url := fmt.Sprintf("%s/connectors/%s/applications/%s", d.client.apiBaseURL, state.ConnectorID.ValueString(), state.ID.ValueString())
 

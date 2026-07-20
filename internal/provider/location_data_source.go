@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 var _ datasource.DataSource = &locationDataSource{}
@@ -109,7 +110,8 @@ func (d *locationDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 	}
 }
 
-func (d *locationDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *locationDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	tflog.Debug(ctx, "Configuring location data source")
 	if req.ProviderData == nil {
 		return
 	}
@@ -128,6 +130,8 @@ func (d *locationDataSource) Read(ctx context.Context, req datasource.ReadReques
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	tflog.Debug(ctx, "Reading location data source", map[string]any{"id": state.ID.ValueString()})
 
 	url := fmt.Sprintf("%s/locations/%s", d.client.apiBaseURL, state.ID.ValueString())
 

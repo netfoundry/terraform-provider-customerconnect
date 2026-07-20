@@ -54,7 +54,7 @@ func New(version string) func() provider.Provider {
 }
 
 func (p *customerConnectProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "customer-connect"
+	resp.TypeName = "customerconnect"
 	resp.Version = p.version
 }
 

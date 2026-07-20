@@ -1,17 +1,17 @@
-resource "customer-connect_location" "example" {
+resource "customerconnect_location" "example" {
   customer_id = "00000000-0000-0000-0000-000000000001"
   name        = "NYC Office"
 }
 
-resource "customer-connect_connector" "example" {
-  location_id = customer-connect_location.example.id
+resource "customerconnect_connector" "example" {
+  location_id = customerconnect_location.example.id
   name        = "nyc-gateway-01"
   type        = "GATEWAY"
 }
 
 # Application with a single service address mapping
-resource "customer-connect_application" "web" {
-  connector_id = customer-connect_connector.example.id
+resource "customerconnect_application" "web" {
+  connector_id = customerconnect_connector.example.id
   name         = "internal-web"
   description  = "Internal web application"
   type         = "HTTP"
@@ -28,8 +28,8 @@ resource "customer-connect_application" "web" {
 }
 
 # Application with multiple address mappings and forwarding enabled
-resource "customer-connect_application" "multi" {
-  connector_id = customer-connect_connector.example.id
+resource "customerconnect_application" "multi" {
+  connector_id = customerconnect_connector.example.id
   name         = "multi-port-app"
   type         = "custom"
   protocol     = "TCP_UDP"

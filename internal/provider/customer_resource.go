@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 var _ resource.Resource = &customerResource{}
@@ -210,7 +211,8 @@ func (r *customerResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 	}
 }
 
-func (r *customerResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *customerResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	tflog.Debug(ctx, "Configuring customer resource")
 	if req.ProviderData == nil {
 		return
 	}
@@ -224,6 +226,8 @@ func (r *customerResource) Configure(_ context.Context, req resource.ConfigureRe
 }
 
 func (r *customerResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	tflog.Debug(ctx, "Creating customer")
+
 	var plan customerModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
@@ -279,6 +283,8 @@ func (r *customerResource) Create(ctx context.Context, req resource.CreateReques
 		state = customerFromAPI(patched)
 	}
 
+	tflog.Debug(ctx, "Created customer", map[string]any{"id": state.ID.ValueString()})
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
@@ -289,11 +295,14 @@ func (r *customerResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
+	tflog.Debug(ctx, "Reading customer", map[string]any{"id": state.ID.ValueString()})
+
 	url := fmt.Sprintf("%s/customers/%s", r.client.apiBaseURL, state.ID.ValueString())
 
 	respBody, _, err := doRequest(ctx, http.MethodGet, url, r.client.accessToken, nil)
 	if err != nil {
 		if errors.Is(err, errNotFound) {
+			tflog.Debug(ctx, "Customer not found, removing from state", map[string]any{"id": state.ID.ValueString()})
 			resp.State.RemoveResource(ctx)
 			return
 		}
@@ -316,6 +325,8 @@ func (r *customerResource) Update(ctx context.Context, req resource.UpdateReques
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	tflog.Debug(ctx, "Updating customer", map[string]any{"id": plan.ID.ValueString()})
 
 	payload := updateCustomerPayload{
 		Name: plan.Name.ValueString(),
@@ -358,6 +369,8 @@ func (r *customerResource) Delete(ctx context.Context, req resource.DeleteReques
 		return
 	}
 
+	tflog.Debug(ctx, "Deleting customer", map[string]any{"id": state.ID.ValueString()})
+
 	url := fmt.Sprintf("%s/customers/%s", r.client.apiBaseURL, state.ID.ValueString())
 
 	_, _, err := doRequest(ctx, http.MethodDelete, url, r.client.accessToken, nil)
@@ -367,5 +380,6 @@ func (r *customerResource) Delete(ctx context.Context, req resource.DeleteReques
 }
 
 func (r *customerResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	tflog.Debug(ctx, "Importing customer", map[string]any{"id": req.ID})
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 // customerCountsDSAttrs returns the computed attributes for the counts
@@ -101,7 +102,8 @@ func (d *customerDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 	}
 }
 
-func (d *customerDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *customerDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	tflog.Debug(ctx, "Configuring customer data source")
 	if req.ProviderData == nil {
 		return
 	}
@@ -120,6 +122,8 @@ func (d *customerDataSource) Read(ctx context.Context, req datasource.ReadReques
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	tflog.Debug(ctx, "Reading customer data source", map[string]any{"id": state.ID.ValueString()})
 
 	url := fmt.Sprintf("%s/customers/%s", d.client.apiBaseURL, state.ID.ValueString())
 

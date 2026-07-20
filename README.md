@@ -15,8 +15,8 @@ Configuring [required providers](https://www.terraform.io/docs/language/provider
 ```terraform
 terraform {
   required_providers {
-    customer-connect = {
-      source  = "netfoundry/customer-connect"
+    customerconnect = {
+      source  = "netfoundry/customerconnect"
     }
   }
 }
@@ -30,7 +30,7 @@ The Customer Connect provider authenticates against the NetFoundry API using **C
 #### Static credentials
 
 ```terraform
-provider "customer-connect" {
+provider "customerconnect" {
   client_id     = "your-client-id"
   client_secret = "your-client-secret"
   environment   = "production"
@@ -42,7 +42,7 @@ provider "customer-connect" {
 Set `NF_CLIENT_ID`, `NF_CLIENT_SECRET`, and optionally `NF_ENVIRONMENT` before running Terraform:
 
 ```terraform
-provider "customer-connect" {}
+provider "customerconnect" {}
 ```
 
 #### Provider arguments
@@ -103,7 +103,7 @@ provider_installation {
 
   dev_overrides {
     # point to local go path for compiled binaries
-    "netfoundry/customer-connect" = "/path/to/go/bin"
+    "netfoundry/customerconnect" = "/path/to/go/bin"
   }
 
   # For all other providers, install them directly from their origin provider

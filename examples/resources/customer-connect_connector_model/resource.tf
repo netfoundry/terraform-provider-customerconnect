@@ -1,5 +1,5 @@
 # Connector model with a single application and address mapping
-resource "customer-connect_connector_model" "web_gateway" {
+resource "customerconnect_connector_model" "web_gateway" {
   provider_id = "00000000-0000-0000-0000-000000000002"
   name        = "web-gateway-model"
   description = "Standard gateway model exposing an internal web application"
@@ -25,7 +25,7 @@ resource "customer-connect_connector_model" "web_gateway" {
 
 # Connector model with multiple applications, including one left for
 # connectors to override via required fields
-resource "customer-connect_connector_model" "multi" {
+resource "customerconnect_connector_model" "multi" {
   provider_id = "00000000-0000-0000-0000-000000000002"
   name        = "multi-app-model"
   type        = "DEVICE"
@@ -55,7 +55,7 @@ resource "customer-connect_connector_model" "multi" {
 }
 
 # SDK-embedded connector model (no type/protocol/addresses on applications)
-resource "customer-connect_connector_model" "sdk" {
+resource "customerconnect_connector_model" "sdk" {
   provider_id = "00000000-0000-0000-0000-000000000002"
   name        = "sdk-embedded-model"
   type        = "SDK_EMBEDDED"
