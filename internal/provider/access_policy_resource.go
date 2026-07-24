@@ -69,9 +69,9 @@ type apiAccessPolicy struct {
 	Destinations []apiAccessPolicyEndpoint `json:"destinations"`
 	Enabled      bool                      `json:"enabled"`
 	CreatedBy    string                    `json:"createdBy"`
-	CreatedAt    string                    `json:"createdAt"`
-	UpdatedAt    string                    `json:"updatedAt"`
-	DeletedAt    string                    `json:"deletedAt"`
+	CreatedAt    apiTimestamp              `json:"createdAt"`
+	UpdatedAt    apiTimestamp              `json:"updatedAt"`
+	DeletedAt    apiTimestamp              `json:"deletedAt"`
 	DeletedBy    string                    `json:"deletedBy"`
 	ZitiName     string                    `json:"zitiName"`
 }
@@ -133,9 +133,9 @@ func accessPolicyFromAPI(api apiAccessPolicy) accessPolicyModel {
 		Destinations: destinations,
 		Enabled:      types.BoolValue(api.Enabled),
 		CreatedBy:    types.StringValue(api.CreatedBy),
-		CreatedAt:    types.StringValue(api.CreatedAt),
-		UpdatedAt:    types.StringValue(api.UpdatedAt),
-		DeletedAt:    stringValOrNull(api.DeletedAt),
+		CreatedAt:    types.StringValue(string(api.CreatedAt)),
+		UpdatedAt:    types.StringValue(string(api.UpdatedAt)),
+		DeletedAt:    stringValOrNull(string(api.DeletedAt)),
 		DeletedBy:    stringValOrNull(api.DeletedBy),
 		ZitiName:     stringValOrNull(api.ZitiName),
 	}

@@ -3,6 +3,7 @@ package provider
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -14,6 +15,47 @@ import (
 )
 
 var errNotFound = errors.New("resource not found")
+
+// apiTimestamp represents a timestamp field returned by the NetFoundry API.
+// The API normally returns RFC3339 strings, but some endpoints return a
+// numeric Unix epoch (seconds or milliseconds) instead. This type accepts
+// either encoding and normalizes it to an RFC3339 string.
+type apiTimestamp string
+
+func (t *apiTimestamp) UnmarshalJSON(data []byte) error {
+	data = bytes.TrimSpace(data)
+	if string(data) == "null" {
+		*t = ""
+		return nil
+	}
+	if len(data) > 0 && data[0] == '"' {
+		var s string
+		if err := json.Unmarshal(data, &s); err != nil {
+			return err
+		}
+		*t = apiTimestamp(s)
+		return nil
+	}
+
+	var n json.Number
+	if err := json.Unmarshal(data, &n); err != nil {
+		return fmt.Errorf("apiTimestamp: %w", err)
+	}
+	i, err := n.Int64()
+	if err != nil {
+		// Not an integer epoch we recognize; keep the raw numeric text
+		// rather than failing the whole response.
+		*t = apiTimestamp(n.String())
+		return nil
+	}
+	sec, nsec := i, int64(0)
+	if i > 1e12 { // value is in milliseconds, not seconds
+		sec = i / 1000
+		nsec = (i % 1000) * int64(time.Millisecond)
+	}
+	*t = apiTimestamp(time.Unix(sec, nsec).UTC().Format(time.RFC3339Nano))
+	return nil
+}
 
 // doRequest executes an authenticated HTTP request against the NetFoundry API.
 // A non-nil body is sent with Content-Type: application/json.

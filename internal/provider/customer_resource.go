@@ -60,9 +60,9 @@ type apiCustomer struct {
 	Enabled         bool              `json:"enabled"`
 	OwnerIdentityID string            `json:"ownerIdentityId"`
 	CreatedBy       string            `json:"createdBy"`
-	CreatedAt       string            `json:"createdAt"`
-	UpdatedAt       string            `json:"updatedAt"`
-	DeletedAt       string            `json:"deletedAt"`
+	CreatedAt       apiTimestamp      `json:"createdAt"`
+	UpdatedAt       apiTimestamp      `json:"updatedAt"`
+	DeletedAt       apiTimestamp      `json:"deletedAt"`
 	DeletedBy       string            `json:"deletedBy"`
 	Deleted         bool              `json:"deleted"`
 	Counts          apiCustomerCounts `json:"counts"`
@@ -106,9 +106,9 @@ func customerFromAPI(api apiCustomer) customerModel {
 		Enabled:         types.BoolValue(api.Enabled),
 		OwnerIdentityID: types.StringValue(api.OwnerIdentityID),
 		CreatedBy:       types.StringValue(api.CreatedBy),
-		CreatedAt:       types.StringValue(api.CreatedAt),
-		UpdatedAt:       types.StringValue(api.UpdatedAt),
-		DeletedAt:       stringValOrNull(api.DeletedAt),
+		CreatedAt:       types.StringValue(string(api.CreatedAt)),
+		UpdatedAt:       types.StringValue(string(api.UpdatedAt)),
+		DeletedAt:       stringValOrNull(string(api.DeletedAt)),
 		DeletedBy:       stringValOrNull(api.DeletedBy),
 		Deleted:         types.BoolValue(api.Deleted),
 		Counts:          customerCountsFromAPI(api.Counts),

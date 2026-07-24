@@ -55,28 +55,28 @@ type connectorModel struct {
 
 // apiConnector mirrors the ConnectorView JSON returned by the API.
 type apiConnector struct {
-	ID                  string `json:"id"`
-	ProviderID          string `json:"providerId"`
-	CustomerID          string `json:"customerId"`
-	LocationID          string `json:"locationId"`
-	Name                string `json:"name"`
-	Description         string `json:"description"`
-	Type                string `json:"type"`
-	ConnectorModelID    string `json:"connectorModelId"`
-	Enabled             bool   `json:"enabled"`
-	OwnerIdentityID     string `json:"ownerIdentityId"`
-	CreatedBy           string `json:"createdBy"`
-	CreatedAt           string `json:"createdAt"`
-	UpdatedAt           string `json:"updatedAt"`
-	DeletedAt           string `json:"deletedAt"`
-	DeletedBy           string `json:"deletedBy"`
-	Deleted             bool   `json:"deleted"`
-	ZitiID              string `json:"zitiId"`
-	ZitiName            string `json:"zitiName"`
-	Online              bool   `json:"online"`
-	Enrolled            bool   `json:"enrolled"`
-	EnrollmentJwt       string `json:"enrollmentJwt"`
-	EnrollmentExpiresAt string `json:"enrollmentExpiresAt"`
+	ID                  string       `json:"id"`
+	ProviderID          string       `json:"providerId"`
+	CustomerID          string       `json:"customerId"`
+	LocationID          string       `json:"locationId"`
+	Name                string       `json:"name"`
+	Description         string       `json:"description"`
+	Type                string       `json:"type"`
+	ConnectorModelID    string       `json:"connectorModelId"`
+	Enabled             bool         `json:"enabled"`
+	OwnerIdentityID     string       `json:"ownerIdentityId"`
+	CreatedBy           string       `json:"createdBy"`
+	CreatedAt           apiTimestamp `json:"createdAt"`
+	UpdatedAt           apiTimestamp `json:"updatedAt"`
+	DeletedAt           apiTimestamp `json:"deletedAt"`
+	DeletedBy           string       `json:"deletedBy"`
+	Deleted             bool         `json:"deleted"`
+	ZitiID              string       `json:"zitiId"`
+	ZitiName            string       `json:"zitiName"`
+	Online              bool         `json:"online"`
+	Enrolled            bool         `json:"enrolled"`
+	EnrollmentJwt       string       `json:"enrollmentJwt"`
+	EnrollmentExpiresAt apiTimestamp `json:"enrollmentExpiresAt"`
 }
 
 type createConnectorPayload struct {
@@ -107,9 +107,9 @@ func connectorFromAPI(api apiConnector) connectorModel {
 		Enabled:             types.BoolValue(api.Enabled),
 		OwnerIdentityID:     types.StringValue(api.OwnerIdentityID),
 		CreatedBy:           types.StringValue(api.CreatedBy),
-		CreatedAt:           types.StringValue(api.CreatedAt),
-		UpdatedAt:           types.StringValue(api.UpdatedAt),
-		DeletedAt:           stringValOrNull(api.DeletedAt),
+		CreatedAt:           types.StringValue(string(api.CreatedAt)),
+		UpdatedAt:           types.StringValue(string(api.UpdatedAt)),
+		DeletedAt:           stringValOrNull(string(api.DeletedAt)),
 		DeletedBy:           stringValOrNull(api.DeletedBy),
 		Deleted:             types.BoolValue(api.Deleted),
 		ZitiID:              stringValOrNull(api.ZitiID),
@@ -117,7 +117,7 @@ func connectorFromAPI(api apiConnector) connectorModel {
 		Online:              types.BoolValue(api.Online),
 		Enrolled:            types.BoolValue(api.Enrolled),
 		EnrollmentJwt:       stringValOrNull(api.EnrollmentJwt),
-		EnrollmentExpiresAt: stringValOrNull(api.EnrollmentExpiresAt),
+		EnrollmentExpiresAt: stringValOrNull(string(api.EnrollmentExpiresAt)),
 	}
 }
 

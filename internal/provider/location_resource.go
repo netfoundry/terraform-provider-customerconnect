@@ -52,25 +52,25 @@ type locationModel struct {
 
 // apiLocation mirrors the Location/LocationView JSON returned by the API.
 type apiLocation struct {
-	ID              string   `json:"id"`
-	ProviderID      string   `json:"providerId"`
-	CustomerID      string   `json:"customerId"`
-	Name            string   `json:"name"`
-	Description     string   `json:"description"`
-	Virtual         bool     `json:"virtual"`
-	Address         string   `json:"address"`
-	Longitude       *float64 `json:"longitude"`
-	Latitude        *float64 `json:"latitude"`
-	CloudProvider   string   `json:"cloudProvider"`
-	CloudRegion     string   `json:"cloudRegion"`
-	Enabled         bool     `json:"enabled"`
-	OwnerIdentityID string   `json:"ownerIdentityId"`
-	CreatedBy       string   `json:"createdBy"`
-	CreatedAt       string   `json:"createdAt"`
-	UpdatedAt       string   `json:"updatedAt"`
-	DeletedAt       string   `json:"deletedAt"`
-	DeletedBy       string   `json:"deletedBy"`
-	Deleted         bool     `json:"deleted"`
+	ID              string       `json:"id"`
+	ProviderID      string       `json:"providerId"`
+	CustomerID      string       `json:"customerId"`
+	Name            string       `json:"name"`
+	Description     string       `json:"description"`
+	Virtual         bool         `json:"virtual"`
+	Address         string       `json:"address"`
+	Longitude       *float64     `json:"longitude"`
+	Latitude        *float64     `json:"latitude"`
+	CloudProvider   string       `json:"cloudProvider"`
+	CloudRegion     string       `json:"cloudRegion"`
+	Enabled         bool         `json:"enabled"`
+	OwnerIdentityID string       `json:"ownerIdentityId"`
+	CreatedBy       string       `json:"createdBy"`
+	CreatedAt       apiTimestamp `json:"createdAt"`
+	UpdatedAt       apiTimestamp `json:"updatedAt"`
+	DeletedAt       apiTimestamp `json:"deletedAt"`
+	DeletedBy       string       `json:"deletedBy"`
+	Deleted         bool         `json:"deleted"`
 }
 
 type createLocationPayload struct {
@@ -112,9 +112,9 @@ func locationFromAPI(api apiLocation) locationModel {
 		Enabled:         types.BoolValue(api.Enabled),
 		OwnerIdentityID: types.StringValue(api.OwnerIdentityID),
 		CreatedBy:       types.StringValue(api.CreatedBy),
-		CreatedAt:       types.StringValue(api.CreatedAt),
-		UpdatedAt:       types.StringValue(api.UpdatedAt),
-		DeletedAt:       stringValOrNull(api.DeletedAt),
+		CreatedAt:       types.StringValue(string(api.CreatedAt)),
+		UpdatedAt:       types.StringValue(string(api.UpdatedAt)),
+		DeletedAt:       stringValOrNull(string(api.DeletedAt)),
 		DeletedBy:       stringValOrNull(api.DeletedBy),
 		Deleted:         types.BoolValue(api.Deleted),
 	}

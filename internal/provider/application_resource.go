@@ -43,23 +43,23 @@ type applicationAddressModel struct {
 
 // applicationModel is shared by both the resource and the data source.
 type applicationModel struct {
-	ID               types.String               `tfsdk:"id"`
-	ProviderID       types.String               `tfsdk:"provider_id"`
-	ConnectorID      types.String               `tfsdk:"connector_id"`
-	ConnectorModelID types.String               `tfsdk:"connector_model_id"`
-	Name             types.String               `tfsdk:"name"`
-	Description      types.String               `tfsdk:"description"`
-	Type             types.String               `tfsdk:"type"`
-	Protocol         types.String               `tfsdk:"protocol"`
-	Enabled          types.Bool                 `tfsdk:"enabled"`
-	ZitiID           types.String               `tfsdk:"ziti_id"`
-	Addresses        []applicationAddressModel  `tfsdk:"addresses"`
-	CreatedBy        types.String               `tfsdk:"created_by"`
-	CreatedAt        types.String               `tfsdk:"created_at"`
-	UpdatedAt        types.String               `tfsdk:"updated_at"`
-	DeletedAt        types.String               `tfsdk:"deleted_at"`
-	DeletedBy        types.String               `tfsdk:"deleted_by"`
-	ZitiName         types.String               `tfsdk:"ziti_name"`
+	ID               types.String              `tfsdk:"id"`
+	ProviderID       types.String              `tfsdk:"provider_id"`
+	ConnectorID      types.String              `tfsdk:"connector_id"`
+	ConnectorModelID types.String              `tfsdk:"connector_model_id"`
+	Name             types.String              `tfsdk:"name"`
+	Description      types.String              `tfsdk:"description"`
+	Type             types.String              `tfsdk:"type"`
+	Protocol         types.String              `tfsdk:"protocol"`
+	Enabled          types.Bool                `tfsdk:"enabled"`
+	ZitiID           types.String              `tfsdk:"ziti_id"`
+	Addresses        []applicationAddressModel `tfsdk:"addresses"`
+	CreatedBy        types.String              `tfsdk:"created_by"`
+	CreatedAt        types.String              `tfsdk:"created_at"`
+	UpdatedAt        types.String              `tfsdk:"updated_at"`
+	DeletedAt        types.String              `tfsdk:"deleted_at"`
+	DeletedBy        types.String              `tfsdk:"deleted_by"`
+	ZitiName         types.String              `tfsdk:"ziti_name"`
 }
 
 // apiServiceAddress mirrors the ServiceAddress JSON returned by the API.
@@ -89,9 +89,9 @@ type apiApplication struct {
 	ZitiID           string              `json:"zitiId"`
 	Addresses        []apiServiceAddress `json:"addresses"`
 	CreatedBy        string              `json:"createdBy"`
-	CreatedAt        string              `json:"createdAt"`
-	UpdatedAt        string              `json:"updatedAt"`
-	DeletedAt        string              `json:"deletedAt"`
+	CreatedAt        apiTimestamp        `json:"createdAt"`
+	UpdatedAt        apiTimestamp        `json:"updatedAt"`
+	DeletedAt        apiTimestamp        `json:"deletedAt"`
 	DeletedBy        string              `json:"deletedBy"`
 	ZitiName         string              `json:"zitiName"`
 }
@@ -209,9 +209,9 @@ func applicationFromAPI(api apiApplication) applicationModel {
 		ZitiID:           stringValOrNull(api.ZitiID),
 		Addresses:        addressesFromAPI(api.Addresses),
 		CreatedBy:        types.StringValue(api.CreatedBy),
-		CreatedAt:        types.StringValue(api.CreatedAt),
-		UpdatedAt:        types.StringValue(api.UpdatedAt),
-		DeletedAt:        stringValOrNull(api.DeletedAt),
+		CreatedAt:        types.StringValue(string(api.CreatedAt)),
+		UpdatedAt:        types.StringValue(string(api.UpdatedAt)),
+		DeletedAt:        stringValOrNull(string(api.DeletedAt)),
 		DeletedBy:        stringValOrNull(api.DeletedBy),
 		ZitiName:         stringValOrNull(api.ZitiName),
 	}
